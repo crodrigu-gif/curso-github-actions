@@ -1,6 +1,7 @@
 name: Hola Mundo
 
 on:
+  workflow_dispatch:
   push:
 
 jobs:
@@ -16,5 +17,8 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Ejecutar script
-        run: python hola_mundo.py
+      - name: Mostrar mensaje
+        run: |
+          echo "=== INICIO ==="
+          python hola_mundo.py
+          echo "=== FIN ==="
