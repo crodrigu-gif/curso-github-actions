@@ -1,0 +1,34 @@
+name: Assign issue IDs
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  issues: write
+
+jobs:
+  assign-id:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prefix issue title with its ID
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue = context.payload.issue;
+            const bugId = `BUG-${String(issue.number).padStart(3, '0')}`;
+            const titleWithoutId = issue.title.replace(/^\[BUG-\d+\]\s*/i, '').trim();
+            const title = titleWithoutId ? `[${bugId}] ${titleWithoutId}` : `[${bugId}]`;
+
+            if (issue.title === title) {
+              core.info(`Issue already has ID ${bugId}.`);
+              return;
+            }
+
+            await github.rest.issues.update({
+              owner,
+              repo,
+              issue_number: issue.number,
+              title
+            });
